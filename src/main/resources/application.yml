@@ -2,3 +2,14 @@
   quarkus:
     http:
       port: 9000
+    datasource:
+      db-kind: postgresql
+      username: demo
+      password: demo
+      reactive:
+        url: vertx-reactive:postgresql://localhost:5432/demo
+    hibernate-orm:
+      database:
+        # drop and create the database at startup (use `update` to only update the schema)
+        # generation: drop-and-create
+        generation: update
