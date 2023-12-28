@@ -35,3 +35,20 @@
 % quarkus ext add quarkus-smallrye-openapi 
 http://localhost:9000/q/swagger-ui/
 ```
+
+## MapStruct
+```text
+<dependencies>
+  <dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.5.5.Final</version>
+  </dependency>
+  <dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.5.5.Final</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+```
