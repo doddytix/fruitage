@@ -1,6 +1,5 @@
 package com.example.fruitage.controller.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FruitDto {
+public class CommonResponse<T> {
 
-  private Long id;
+  private int code;
 
-  @NotBlank(message = "name may not be blank")
-  private String name;
+  private String message;
 
-  private boolean favorite;
+  private T data;
 }
