@@ -1,7 +1,7 @@
-package com.example.fruitage.mapper;
+package com.example.fruitage.service.mapper;
 
-import com.example.fruitage.dto.FruitDto;
-import com.example.fruitage.entity.Fruit;
+import com.example.fruitage.controller.dto.FruitDto;
+import com.example.fruitage.repository.entity.Fruit;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

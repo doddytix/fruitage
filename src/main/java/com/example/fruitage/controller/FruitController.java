@@ -1,9 +1,10 @@
 package com.example.fruitage.controller;
 
-import com.example.fruitage.dto.FruitDto;
+import com.example.fruitage.controller.dto.FruitDto;
 import com.example.fruitage.service.FruitService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -12,13 +13,13 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 
 @Path("fruits")
-public class FruitController extends ErrorHandlerController {
+public class FruitController {
 
   @Inject
   FruitService fruitService;
 
   @POST
-  public Uni<Response> create(FruitDto fruitDto) {
+  public Uni<Response> create(@Valid FruitDto fruitDto) {
     return fruitService.create(fruitDto);
   }
 

@@ -1,6 +1,6 @@
 package com.example.fruitage.service;
 
-import com.example.fruitage.dto.FruitDto;
+import com.example.fruitage.controller.dto.FruitDto;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.Response;
 

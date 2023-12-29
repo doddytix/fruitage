@@ -1,8 +1,12 @@
-package com.example.fruitage.dto;
+package com.example.fruitage.controller.dto;
+
+import jakarta.validation.constraints.NotBlank;
 
 public class FruitDto {
 
   private Long id;
+
+  @NotBlank(message = "name may not be blank")
   private String name;
 
   private boolean favorite;

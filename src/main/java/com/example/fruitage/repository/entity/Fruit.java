@@ -1,4 +1,4 @@
-package com.example.fruitage.entity;
+package com.example.fruitage.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
