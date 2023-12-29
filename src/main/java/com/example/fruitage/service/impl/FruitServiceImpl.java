@@ -57,7 +57,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithSession
   @Override
   public Uni<Response> listAll(PageRequest pageRequest) {
-    return fruitRepository.findAll()
+    return fruitRepository.findAll(getSortFromQuery(pageRequest.getSortQuery()))
         .page(pageRequest.getPage(), pageRequest.getSize()).list()
         .map(entities -> fruitMapper.toDtos(entities))
         .map(dtos -> buildSuccessResponse(Status.OK, dtos))
