@@ -1,6 +1,7 @@
 package com.example.fruitage.service;
 
 import com.example.fruitage.controller.dto.FruitDto;
+import com.example.fruitage.controller.dto.PageRequest;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.Response;
 
@@ -9,6 +10,8 @@ public interface FruitService {
   Uni<Response> create(FruitDto fruitDto);
 
   Uni<Response> listAll();
+
+  Uni<Response> listAll(PageRequest pageRequest);
 
   Uni<Response> findById(Long id);
 

@@ -1,6 +1,7 @@
 package com.example.fruitage.service.impl;
 
 import com.example.fruitage.controller.dto.FruitDto;
+import com.example.fruitage.controller.dto.PageRequest;
 import com.example.fruitage.service.mapper.FruitMapper;
 import com.example.fruitage.repository.FruitRepository;
 import com.example.fruitage.service.FruitService;
@@ -14,13 +15,12 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import java.util.Objects;
+import lombok.extern.jbosslog.JBossLog;
 import org.apache.commons.lang3.BooleanUtils;
-import org.jboss.logging.Logger;
 
+@JBossLog
 @ApplicationScoped
 public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
-
-  private static final Logger log = Logger.getLogger(FruitServiceImpl.class);
 
   @Inject
   FruitMapper fruitMapper;
@@ -42,7 +42,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
         .flatMap(entity -> fruitRepository.persist(entity))
         .map(entity -> fruitMapper.toDto(entity))
         .map(dto -> buildSuccessResponse(Status.CREATED, dto))
-        .onFailure().invoke(t -> log.error("Error create entity", t));
+        .onFailure().invoke(t -> log.errorv(t, "Error create fruit -> request: {0}", fruitDto));
   }
 
   @WithSession
@@ -51,7 +51,17 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
     return fruitRepository.listAll()
         .map(entities -> fruitMapper.toDtos(entities))
         .map(dtos -> buildSuccessResponse(Status.OK, dtos))
-        .onFailure().invoke(t -> log.error("Error list all entities", t));
+        .onFailure().invoke(t -> log.error("Error list all fruits", t));
+  }
+
+  @WithSession
+  @Override
+  public Uni<Response> listAll(PageRequest pageRequest) {
+    return fruitRepository.findAll()
+        .page(pageRequest.getPage(), pageRequest.getSize()).list()
+        .map(entities -> fruitMapper.toDtos(entities))
+        .map(dtos -> buildSuccessResponse(Status.OK, dtos))
+        .onFailure().invoke(t -> log.error("Error list all fruits", t));
   }
 
   @WithSession
@@ -61,7 +71,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
         .onItem().ifNotNull().transform(entity ->
             buildSuccessResponse(Status.OK, fruitMapper.toDto(entity)))
         .onItem().ifNull().failWith(() -> new WebApplicationException("Fruit Not Found", Status.NOT_FOUND))
-        .onFailure().invoke(t -> log.error("Error findById", t));
+        .onFailure().invoke(t -> log.errorv(t, "Error find fruit -> id: {0}", id));
   }
 
   @WithTransaction
@@ -80,7 +90,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
           return buildSuccessResponse(Status.OK, fruitMapper.toDto(entity));
         })
         .onItem().ifNull().failWith(() -> new WebApplicationException("Fruit Not Found", Status.NOT_FOUND))
-        .onFailure().invoke(t -> log.error("Error update", t));
+        .onFailure().invoke(t -> log.errorv(t,"Error update fruit -> id: {0}, request: {1}", id, fruitDto));
   }
 
   @WithTransaction
@@ -90,6 +100,6 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
         .map(deleted -> BooleanUtils.isTrue(deleted)
             ? Response.ok().status(Status.NO_CONTENT).build()
             : Response.ok().status(Status.NOT_FOUND).build())
-        .onFailure().invoke(t -> log.error("Error delete", t));
+        .onFailure().invoke(t -> log.errorv(t, "Error delete fruit -> id: {0}", id));
   }
 }
