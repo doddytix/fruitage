@@ -31,6 +31,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithTransaction
   @Override
   public Uni<Response> create(FruitDto fruitDto) {
+    log.infov("create -> request: {0}", fruitDto);
     return Uni.createFrom()
         .item(() -> Objects.nonNull(fruitDto) && Objects.isNull(fruitDto.getId()))
         .map(Unchecked.function(valid -> {
@@ -48,6 +49,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithSession
   @Override
   public Uni<Response> listAll() {
+    log.info("listAll");
     return fruitRepository.listAll()
         .map(entities -> fruitMapper.toDtos(entities))
         .map(dtos -> buildSuccessResponse(Status.OK, dtos))
@@ -57,6 +59,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithSession
   @Override
   public Uni<Response> listAll(PageRequest pageRequest) {
+    log.infov("listAll -> request: {0}", pageRequest);
     return fruitRepository.findAll(getSortFromQuery(pageRequest.getSortQuery()))
         .page(pageRequest.getPage(), pageRequest.getSize()).list()
         .map(entities -> fruitMapper.toDtos(entities))
@@ -67,6 +70,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithSession
   @Override
   public Uni<Response> findById(Long id) {
+    log.infov("findById -> id: {0}", id);
     return fruitRepository.findById(id)
         .onItem().ifNotNull().transform(entity ->
             buildSuccessResponse(Status.OK, fruitMapper.toDto(entity)))
@@ -77,6 +81,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithTransaction
   @Override
   public Uni<Response> update(Long id, FruitDto fruitDto) {
+    log.infov("update -> id: {0}, request: {1}", id, fruitDto);
     return Uni.createFrom()
         .item(() -> Objects.nonNull(fruitDto) && Objects.nonNull(fruitDto.getId()))
         .flatMap(Unchecked.function(valid -> {
@@ -96,6 +101,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
   @WithTransaction
   @Override
   public Uni<Response> delete(Long id) {
+    log.infov("delete -> id: {0}", id);
     return fruitRepository.deleteById(id)
         .map(deleted -> BooleanUtils.isTrue(deleted)
             ? Response.ok().status(Status.NO_CONTENT).build()

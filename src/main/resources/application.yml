@@ -13,3 +13,11 @@
         # drop and create the database at startup (use `update` to only update the schema)
         # generation: drop-and-create
         generation: update
+    log:
+      console:
+        json: false
+      level: INFO
+      min-level: DEBUG
+      category:
+        "org.hibernate":
+          min-level: DEBUG
