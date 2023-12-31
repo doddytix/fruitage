@@ -1,5 +1,7 @@
 package com.example.fruitage.service.impl;
 
+import static com.example.fruitage.util.CommonHelper.buildSortFromQuery;
+
 import com.example.fruitage.controller.dto.FruitDto;
 import com.example.fruitage.controller.dto.PageRequest;
 import com.example.fruitage.service.mapper.FruitMapper;
@@ -12,15 +14,15 @@ import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.commons.lang3.BooleanUtils;
 
 @JBossLog
 @ApplicationScoped
-public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
+public class FruitServiceImpl implements FruitService {
 
   @Inject
   FruitMapper fruitMapper;
@@ -30,7 +32,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
 
   @WithTransaction
   @Override
-  public Uni<Response> create(FruitDto fruitDto) {
+  public Uni<FruitDto> create(FruitDto fruitDto) {
     log.infov("create -> request: {0}", fruitDto);
     return Uni.createFrom()
         .item(() -> Objects.nonNull(fruitDto) && Objects.isNull(fruitDto.getId()))
@@ -42,45 +44,41 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
         }))
         .flatMap(entity -> fruitRepository.persist(entity))
         .map(entity -> fruitMapper.toDto(entity))
-        .map(dto -> buildSuccessResponse(Status.CREATED, dto))
         .onFailure().invoke(t -> log.errorv(t, "Error create fruit -> request: {0}", fruitDto));
   }
 
   @WithSession
   @Override
-  public Uni<Response> listAll() {
+  public Uni<List<FruitDto>> listAll() {
     log.info("listAll");
     return fruitRepository.listAll()
         .map(entities -> fruitMapper.toDtos(entities))
-        .map(dtos -> buildSuccessResponse(Status.OK, dtos))
         .onFailure().invoke(t -> log.error("Error list all fruits", t));
   }
 
   @WithSession
   @Override
-  public Uni<Response> listAll(PageRequest pageRequest) {
+  public Uni<List<FruitDto>> listAll(PageRequest pageRequest) {
     log.infov("listAll -> request: {0}", pageRequest);
-    return fruitRepository.findAll(getSortFromQuery(pageRequest.getSortQuery()))
+    return fruitRepository.findAll(buildSortFromQuery(pageRequest.getSortQuery()))
         .page(pageRequest.getPage(), pageRequest.getSize()).list()
         .map(entities -> fruitMapper.toDtos(entities))
-        .map(dtos -> buildSuccessResponse(Status.OK, dtos))
         .onFailure().invoke(t -> log.error("Error list all fruits", t));
   }
 
   @WithSession
   @Override
-  public Uni<Response> findById(Long id) {
+  public Uni<FruitDto> findById(Long id) {
     log.infov("findById -> id: {0}", id);
     return fruitRepository.findById(id)
-        .onItem().ifNotNull().transform(entity ->
-            buildSuccessResponse(Status.OK, fruitMapper.toDto(entity)))
+        .onItem().ifNotNull().transform(entity -> fruitMapper.toDto(entity))
         .onItem().ifNull().failWith(() -> new WebApplicationException("Fruit Not Found", Status.NOT_FOUND))
         .onFailure().invoke(t -> log.errorv(t, "Error find fruit -> id: {0}", id));
   }
 
   @WithTransaction
   @Override
-  public Uni<Response> update(Long id, FruitDto fruitDto) {
+  public Uni<FruitDto> update(Long id, FruitDto fruitDto) {
     log.infov("update -> id: {0}, request: {1}", id, fruitDto);
     return Uni.createFrom()
         .item(() -> Objects.nonNull(fruitDto) && Objects.nonNull(fruitDto.getId()))
@@ -92,7 +90,7 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
         }))
         .onItem().ifNotNull().transform(entity -> {
           fruitMapper.update(fruitDto, entity);
-          return buildSuccessResponse(Status.OK, fruitMapper.toDto(entity));
+          return fruitMapper.toDto(entity);
         })
         .onItem().ifNull().failWith(() -> new WebApplicationException("Fruit Not Found", Status.NOT_FOUND))
         .onFailure().invoke(t -> log.errorv(t,"Error update fruit -> id: {0}, request: {1}", id, fruitDto));
@@ -100,12 +98,9 @@ public class FruitServiceImpl extends BaseServiceImpl implements FruitService {
 
   @WithTransaction
   @Override
-  public Uni<Response> delete(Long id) {
+  public Uni<Boolean> delete(Long id) {
     log.infov("delete -> id: {0}", id);
     return fruitRepository.deleteById(id)
-        .map(deleted -> BooleanUtils.isTrue(deleted)
-            ? Response.ok().status(Status.NO_CONTENT).build()
-            : Response.ok().status(Status.NOT_FOUND).build())
         .onFailure().invoke(t -> log.errorv(t, "Error delete fruit -> id: {0}", id));
   }
 }

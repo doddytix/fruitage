@@ -3,19 +3,19 @@ package com.example.fruitage.service;
 import com.example.fruitage.controller.dto.FruitDto;
 import com.example.fruitage.controller.dto.PageRequest;
 import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 public interface FruitService {
 
-  Uni<Response> create(FruitDto fruitDto);
+  Uni<FruitDto> create(FruitDto fruitDto);
 
-  Uni<Response> listAll();
+  Uni<List<FruitDto>> listAll();
 
-  Uni<Response> listAll(PageRequest pageRequest);
+  Uni<List<FruitDto>> listAll(PageRequest pageRequest);
 
-  Uni<Response> findById(Long id);
+  Uni<FruitDto> findById(Long id);
 
-  Uni<Response> update(Long id, FruitDto fruitDto);
+  Uni<FruitDto> update(Long id, FruitDto fruitDto);
 
-  Uni<Response> delete(Long id);
+  Uni<Boolean> delete(Long id);
 }

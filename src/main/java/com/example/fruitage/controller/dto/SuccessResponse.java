@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommonResponse<T> {
+public class SuccessResponse<T> {
 
   private int code;
 
